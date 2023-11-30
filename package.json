@@ -11,7 +11,10 @@
     "query"
   ],
   "author": "ClassFunc Softwares JSC",
-  "license": "ISC",
+  "repository": {
+    "url": "git+https://github.com/ClassFunc/firestore-querier.git"
+  },
+  "license": "MIT",
   "dependencies": {
     "lodash": "^4.17.21"
   }
