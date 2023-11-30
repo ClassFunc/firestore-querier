@@ -176,10 +176,10 @@ function _toStringRecursive(ob) {
 }
 
 
-function onProcessExit(callback) {
-    process.on('exit', callback);
-    process.on('SIGINT', callback);
-    process.on('SIGTERM', callback);
+function onProcessExit(exitFn) {
+    process.on('exit', exitFn);
+    process.on('SIGINT', exitFn);
+    process.on('SIGTERM', exitFn);
 }
 
 
