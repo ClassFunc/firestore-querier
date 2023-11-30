@@ -10,6 +10,7 @@ const {
     first,
 } = require("lodash");
 
+const isDebugMode = process.env.FIRESTORE_QUERIER_DEBUG === 'true'
 const _collQueryBuilder = (firestoreInstance, coll, wheres) => {
     let collRef = firestoreInstance.collection(coll)
     if (isEmpty(wheres)) {
@@ -19,9 +20,7 @@ const _collQueryBuilder = (firestoreInstance, coll, wheres) => {
     wheres.forEach(where => {
         if (Array.isArray(where)) {
             collRef = collRef.where(...where)
-        }
-        if (isObject(where)) {
-            //     key,val
+        } else if (isObject(where)) {
             Object.keys(where).forEach(
                 key => {
                     if (isFunction(collRef[key])) {
@@ -41,14 +40,18 @@ const _collQueryBuilder = (firestoreInstance, coll, wheres) => {
 }
 
 async function queryWheres(firestoreInstance, coll, wheres, filters, transforms, appendRootFields) {
-    _logQueryColl(coll, wheres, filters, transforms, appendRootFields)
+    if (isDebugMode) {
+        _logQueryColl(coll, wheres, filters, transforms, appendRootFields)
+    }
     const collRef = _collQueryBuilder(firestoreInstance, coll, wheres)
     const snapshot = await collRef.get()
     return _executeSnapshot(snapshot, filters, transforms, appendRootFields)
 }
 
 function onSnapshotQueryWheres(firestoreInstance, coll, wheres, filters, transforms, appendRootFields, callback, onError) {
-    _logQueryColl(coll, wheres, filters, transforms, appendRootFields)
+    if (isDebugMode) {
+        _logQueryColl(coll, wheres, filters, transforms, appendRootFields)
+    }
     const collRef = _collQueryBuilder(firestoreInstance, coll, wheres)
     return collRef.onSnapshot(
         snapshot => {
@@ -63,7 +66,9 @@ function onSnapshotQueryWheres(firestoreInstance, coll, wheres, filters, transfo
 
 
 async function queryDoc(firestoreInstance, docPath, transforms, appendRootFields) {
-    _logQueryDoc(docPath, transforms, appendRootFields)
+    if (isDebugMode) {
+        _logQueryDoc(docPath, transforms, appendRootFields)
+    }
     const docRef = firestoreInstance.doc(docPath)
     const doc = await docRef.get()
     if (!doc.exists) {
@@ -87,7 +92,9 @@ async function queryDoc(firestoreInstance, docPath, transforms, appendRootFields
 }
 
 function onSnapshotQueryDoc(firestoreInstance, docPath, transforms, appendRootFields, callback, onError) {
-    _logQueryDoc(docPath, transforms, appendRootFields)
+    if (isDebugMode) {
+        _logQueryDoc(docPath, transforms, appendRootFields)
+    }
     const docRef = firestoreInstance.doc(docPath)
     return docRef.onSnapshot(
         snapshot => {
